@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Quilometragem</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-image: url('https://picsum.photos/1920/1080?blur=5');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+    <header class="bg-gradient-to-r from-blue-500 to-purple-600 py-8 shadow-md">
+        <h1 class="text-3xl font-bold text-center text-white">Controle de Quilometragem</h1>
+    </header>
+
+    <main class="flex-grow">
+        <div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <form>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label for="data" class="block text-gray-700 font-bold mb-2">Data:</label>
+                            <input type="date" id="data" name="data" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="kmInicial" class="block text-gray-700 font-bold mb-2">KM Inicial:</label>
+                            <input type="number" id="kmInicial" name="kmInicial" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="kmFinal" class="block text-gray-700 font-bold mb-2">KM Final:</label>
+                            <input type="number" id="kmFinal" name="kmFinal" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                        <div>
+                            <label for="fotoKm" class="block text-gray-700 font-bold mb-2">Foto do KM:</label>
+                            <input type="file" id="fotoKm" name="fotoKm" accept="image/*" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                            <img id="preview" class="mt-2 max-w-full h-auto rounded-md" src="" alt="Imagem de Visualização">
+                        </div>
+                        <div>
+                            <label for="nomeFuncionario" class="block text-gray-700 font-bold mb-2">Nome do
+                                Funcionário:</label>
+                            <input type="text" id="nomeFuncionario" name="nomeFuncionario" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="observacao" class="block text-gray-700 font-bold mb-2">Observação:</label>
+                            <textarea id="observacao" name="observacao" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"></textarea>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <label for="localizacao" class="block text-gray-700 font-bold mb-2">Localização:</label>
+                            <input type="text" id="localizacao" name="localizacao" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent">
+                        </div>
+                    </div>
+                    <div class="mt-6">
+                        <div id="map" class="h-64 bg-gray-300 rounded-md"></div>
+                    </div>
+                    <div class="mt-6 flex justify-center">
+                        <button type="submit" class="bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-6 rounded-full shadow-md hover:shadow-lg transition-shadow duration-300 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-gray-800 py-4 mt-auto">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-gray-400">&copy; 2023 Controle de Quilometragem. Todos os direitos reservados.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            var form = document.getElementsByTagName('form')[0];
+            var preview = document.getElementById('preview');
+
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                // Valores
+                var data = document.getElementById('data').value;
+                var kmInicial = document.getElementById('kmInicial').value;
+                var kmFinal = document.getElementById('kmFinal').value;
+                var fotoKm = document.getElementById('fotoKm').value;
+                var nomeFuncionario = document.getElementById('nomeFuncionario').value;
+                var observacao = document.getElementById('observacao').value;
+                var localizacao = document.getElementById('localizacao').value;
+
+                // Construção CSV
+                var csv = `"Data","KM Inicial","KM Final","Foto do KM","Nome do Funcionário","Observação","Localização"\n`;
+                csv += `"${data}","${kmInicial}","${kmFinal}","${fotoKm}","${nomeFuncionario}","${observacao}","${localizacao}"`;
+
+                // Dawnload Arquivo CSV
+                var downloadLink = document.createElement('a');
+                downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+                downloadLink.target = '_blank';
+                downloadLink.download = 'form_data.csv';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+            });
+
+            // Pegar Localização em tempo real do usuário.
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    var localizacao = document.getElementById('localizacao');
+                    localizacao.value = latitude + ',' + longitude;
+
+                    // ver mapa de localização.
+                    var mapDiv = document.getElementById('map');
+                    var map = new google.maps.Map(mapDiv, {
+                        center: new google.maps.LatLng(latitude, longitude),
+                        zoom: 15
+                    });
+
+                    var marker = new google.maps.Marker({
+                        position: new google.maps.LatLng(latitude, longitude),
+                        map: map
+                    });
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+
+            // Visualização da imagem
+            var fotoKmInput = document.getElementById('fotoKm');
+            fotoKmInput.addEventListener('change', function() {
+                var file = this.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function() {
+                        preview.src = reader.result;
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.src = '';
+                }
+            });
+        });
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&callback=myMap"></script>
+</body>
+
+</html>
